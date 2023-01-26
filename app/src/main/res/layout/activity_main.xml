@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#909090"
+    tools:context=".MainActivity">
+
+    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+        android:id="@+id/youtube_player_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        />
+
+
+    <TextView
+        android:id="@+id/currentState_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Current State!"
+        android:layout_gravity="center"
+
+        />
+
+    <TextView
+        android:id="@+id/youtube_video_url_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Video URL"
+        android:layout_gravity="center"
+
+        />
+
+    <TextView
+        android:id="@+id/session_id_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SessionID"
+        android:layout_gravity="center"
+
+        />
+
+    <TextView
+        android:id="@+id/stateOfPlayer_id_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SessionID"
+        android:layout_gravity="center"
+
+        />
+
+    <TextView
+        android:id="@+id/seeking_id_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SessionID"
+        android:layout_gravity="center"
+
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="playBtn"
+        android:text="Play Video" />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="loadBtn"
+        android:text="Load Video" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="pauseBtn"
+        android:text="Pause Video" />
+
+    <EditText
+        android:id="@+id/seektoEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="seekToBtn"
+        android:text="Seek To" />
+
+</LinearLayout>

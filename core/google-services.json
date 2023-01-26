@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "953966771257",
+    "firebase_url": "https://synctube-36fbf-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "synctube-36fbf",
+    "storage_bucket": "synctube-36fbf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953966771257:android:3b1c32a16047d2f25f61e8",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "953966771257-i1c30gk0qp0sjtpom4q54d3pli0j6bt4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnvCSBEiGtlXukVj0cCOzT91VzahlftFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "953966771257-i1c30gk0qp0sjtpom4q54d3pli0j6bt4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953966771257:android:b3ac4f52c4e850485f61e8",
+        "android_client_info": {
+          "package_name": "com.pierfrancescosoffritti.androidyoutubeplayer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "953966771257-i1c30gk0qp0sjtpom4q54d3pli0j6bt4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnvCSBEiGtlXukVj0cCOzT91VzahlftFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "953966771257-i1c30gk0qp0sjtpom4q54d3pli0j6bt4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
