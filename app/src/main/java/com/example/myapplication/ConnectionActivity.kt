@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
@@ -49,10 +52,27 @@ class ConnectionActivity : AppCompatActivity() {
 
     fun joinSession(view: View) {
 
-        myRef.child("session_" + mSessionCodeEd.text.toString()).child("joined").setValue("1")
+        myRef.addListenerForSingleValueEvent(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(!snapshot.child("session_" + mSessionCodeEd.text.toString()).child("joined").exists()){
+                    myRef.child("session_" + mSessionCodeEd.text.toString()).child("joined").setValue("1")
+                }else{
+                    var joinedNum = snapshot.child("session_" + mSessionCodeEd.text.toString()).child("joined").getValue(String::class.java)?.toInt()
+                    joinedNum = joinedNum?.plus(1)
+                    myRef.child("session_" + mSessionCodeEd.text.toString()).child("joined").setValue(joinedNum.toString())
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+
+
         val i = Intent(this, MainActivity::class.java)
         i.putExtra("sessionID", mSessionCodeEd.text.toString())
         startActivity(i)
+
     }
 
 }
