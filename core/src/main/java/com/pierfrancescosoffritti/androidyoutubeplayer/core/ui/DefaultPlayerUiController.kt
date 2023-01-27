@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -24,7 +25,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.ui.utils.FadeViewHel
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.ui.views.YouTubePlayerSeekBar
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.ui.views.YouTubePlayerSeekBarListener
 
-class DefaultPlayerUiController(private val youTubePlayerView: YouTubePlayerView, private val youTubePlayer: YouTubePlayer, private val seekingTV :TextView, firebaseDB: FirebaseDatabase) : PlayerUiController {
+class DefaultPlayerUiController(private val youTubePlayerView: YouTubePlayerView, private val youTubePlayer: YouTubePlayer, private val seekingTV :TextView, firebaseDB: FirebaseDatabase, dbPath: String) : PlayerUiController {
 
     val rootView: View = View.inflate(youTubePlayerView.context, R.layout.ayp_default_player_ui, null)
 
@@ -64,7 +65,7 @@ class DefaultPlayerUiController(private val youTubePlayerView: YouTubePlayerView
 
 
     private val database = firebaseDB
-    var myRef = database.getReference("sessions")
+    var myRef = database.getReference(dbPath)
 
     private val youTubePlayerStateListener = object : AbstractYouTubePlayerListener() {
         override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
@@ -132,11 +133,11 @@ class DefaultPlayerUiController(private val youTubePlayerView: YouTubePlayerView
                     seekingTV.text = "Not Seeking"
 
                 }
-                myRef.child("session1").child("seekingState").setValue(seeking.toString())
+                myRef.child("seekingState").setValue(seeking.toString())
             }
 
             override fun seekedProgress(seek: String) {
-                myRef.child("session1").child("seekingTime").setValue(seek)
+                myRef.child("seekingTime").setValue(seek)
             }
 
         }

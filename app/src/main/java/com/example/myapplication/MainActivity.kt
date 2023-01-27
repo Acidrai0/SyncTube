@@ -25,18 +25,22 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var initializedYouTubePlayer: YouTubePlayer
     lateinit var youTubePlayerView: YouTubePlayerView
+    lateinit var defaultPlayerUiController: DefaultPlayerUiController
 
 
-    private lateinit var seekToEditText: EditText
+    lateinit var seekToEditText: EditText
     lateinit var stateOfPlayer: TextView
     lateinit var seekinTime: TextView
 
+
     val database = Firebase.database
-    var myRef = database.getReference("sessions")
+    var dbPath: String = "sessions"
+    var myRef = database.getReference(dbPath)
 
-    private lateinit var defaultPlayerUiController: DefaultPlayerUiController
 
-
+    var sessionID = ""
+    var videoLoaded = false
+    var previousVideoId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,19 +51,34 @@ class MainActivity : AppCompatActivity() {
         stateOfPlayer = findViewById(R.id.seeking_id_tv)
 
 
+        sessionID = intent.getStringExtra("sessionID").toString()
+
+
+
+        dbPath = "sessions/session_$sessionID"
+        myRef = database.getReference(dbPath)
 
         initializePlayer()
-        loadVideo("LtMvg0RfSuA")
+
 
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
 
                 Log.e("pleasework", dataSnapshot.toString())
 
-                val videoState = dataSnapshot.child("session1").child("videoState").getValue(String::class.java)
-                val seekingState = dataSnapshot.child("session1").child("seekingState").getValue(String::class.java)
-                val seekingTime = dataSnapshot.child("session1").child("seekingTime").getValue(String::class.java)
+                val videoState = dataSnapshot.child("videoState").getValue(String::class.java)
+                val seekingState = dataSnapshot.child("seekingState").getValue(String::class.java)
+                val seekingTime = dataSnapshot.child("seekingTime").getValue(String::class.java)
+                val videoId = dataSnapshot.child("videoURL").getValue(String::class.java).toString()
+
+
                 var seeked = false
+
+                if(!videoLoaded) {
+                    //Check if video is not loaded
+                    loadVideo(videoId)
+                    videoLoaded = true
+                }
 
 
                 if (videoState == "PAUSED") {
@@ -81,6 +100,9 @@ class MainActivity : AppCompatActivity() {
                 // Failed to read value
             }
         })
+
+
+
 
     }
 
@@ -108,12 +130,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadVideo(videoId: String) {
         if (::initializedYouTubePlayer.isInitialized) {
-            initializedYouTubePlayer.loadVideo(videoId, 700f)
+            initializedYouTubePlayer.loadVideo(videoId, 0f)
         } else {
             youTubePlayerView.getYouTubePlayerWhenReady(object : YouTubePlayerCallback {
                 override fun onYouTubePlayer(youTubePlayer: YouTubePlayer) {
                     initializedYouTubePlayer = youTubePlayer
-                    initializedYouTubePlayer.loadVideo(videoId, 700f)
+                    initializedYouTubePlayer.loadVideo(videoId, 0f)
                 }
             })
         }
@@ -186,7 +208,7 @@ class MainActivity : AppCompatActivity() {
         val listener = object: AbstractYouTubePlayerListener() {
             override fun onReady(youTubePlayer: YouTubePlayer) {
 
-                defaultPlayerUiController = DefaultPlayerUiController(youTubePlayerView, youTubePlayer, stateOfPlayer, database)
+                defaultPlayerUiController = DefaultPlayerUiController(youTubePlayerView, youTubePlayer, stateOfPlayer, database, dbPath)
                 youTubePlayerView.setCustomPlayerUi(defaultPlayerUiController.rootView)
 
                 initializedYouTubePlayer = youTubePlayer
@@ -201,12 +223,12 @@ class MainActivity : AppCompatActivity() {
             override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
                 stateOfPlayer.text = state.toString()
                 if(state == PlayerConstants.PlayerState.PLAYING){
-                    myRef.child("session1").child("videoState").setValue(state.toString())
+                    myRef.child("videoState").setValue(state.toString())
                 }else if (state == PlayerConstants.PlayerState.PAUSED){
-                    myRef.child("session1").child("videoState").setValue(state.toString())
-                    myRef.child("session1").child("seekingTime").setValue(currentSecond.toString())
+                    myRef.child("videoState").setValue(state.toString())
+                    myRef.child("seekingTime").setValue(currentSecond.toString())
                 }else if(state == PlayerConstants.PlayerState.UNSTARTED){
-                    myRef.child("session1").child("videoState").setValue(state.toString())
+                    myRef.child("videoState").setValue(state.toString())
                 }
 
             }

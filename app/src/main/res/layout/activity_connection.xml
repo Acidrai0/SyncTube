@@ -9,7 +9,7 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         />
 
     <LinearLayout
@@ -21,19 +21,23 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="Create a new Session"
-            android:gravity="center"/>
+            android:textSize="18sp" />
 
         <EditText
-            android:layout_width="match_parent"
+            android:id="@+id/youtube_link_Ed"
+            android:layout_width="360dp"
             android:layout_height="wrap_content"
             android:hint="Put YouTube Link Here"
-            />
+            android:text="LtMvg0RfSuA"
+            android:textSize="16sp" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Create"
+            android:onClick="createSession"
             android:gravity="center"/>
 
     </LinearLayout>
@@ -53,18 +57,22 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="Join Session"
-            android:gravity="center"/>
+            android:textSize="18sp" />
 
         <EditText
-            android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-            android:hint="Session Code"/>
+            android:id="@+id/session_code_Ed"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:hint="Session Code"
+            android:textSize="16sp" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Join"
+            android:onClick="joinSession"
             android:gravity="center"/>
     </LinearLayout>
 
