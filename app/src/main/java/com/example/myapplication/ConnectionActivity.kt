@@ -3,6 +3,8 @@ package com.example.myapplication
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.EditText
 import com.google.firebase.database.DataSnapshot
@@ -72,6 +74,7 @@ class ConnectionActivity : AppCompatActivity() {
         val i = Intent(this, MainActivity::class.java)
         i.putExtra("sessionID", mSessionCodeEd.text.toString())
         startActivity(i)
+
 
     }
 

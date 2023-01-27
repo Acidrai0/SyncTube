@@ -64,11 +64,22 @@ class MainActivity : AppCompatActivity() {
         initializePlayer()
 
 
-        myRef.child("seekingState").setValue("false")
-        myRef.child("seekingTime").setValue("0")
 
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+                if(!dataSnapshot.child("seekingTime").exists()){
+                    myRef.child("seekingTime").setValue("0")
+                }
+                if(!dataSnapshot.child("seekingState").exists()){
+                    myRef.child("seekingState").setValue("false")
+                }
+                if(!dataSnapshot.child("joined").exists()){
+                    myRef.child("joined").setValue("0")
+                }
+
+
+
 
                 Log.e("pleasework", dataSnapshot.toString())
 
@@ -76,15 +87,14 @@ class MainActivity : AppCompatActivity() {
                 val seekingState = dataSnapshot.child("seekingState").getValue(String::class.java)
                 val seekingTime = dataSnapshot.child("seekingTime").getValue(String::class.java)
                 val videoId = dataSnapshot.child("videoURL").getValue(String::class.java).toString()
-                var joined = 0
-                //Very Bad Logic I know
+
 
 
                 if(dataSnapshot.child("joined").exists()){
-                    joined = dataSnapshot.child("joined").getValue(String::class.java)?.toInt()!!
+                    val joined = dataSnapshot.child("joined").getValue(String::class.java)?.toInt()!!
                     if(joined > currentUsers){
-                        currentUsers = joined
                         updateJoinedUsersTime = true
+                        currentUsers = joined
                     }else{
                         updateJoinedUsersTime = false
                     }
