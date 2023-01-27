@@ -28,10 +28,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var defaultPlayerUiController: DefaultPlayerUiController
 
 
+
     lateinit var seekToEditText: EditText
     lateinit var stateOfPlayer: TextView
     lateinit var seekinTime: TextView
-
+    lateinit var videoURLEditText: EditText
 
     val database = Firebase.database
     var dbPath: String = "sessions"
@@ -40,7 +41,11 @@ class MainActivity : AppCompatActivity() {
 
     var sessionID = ""
     var videoLoaded = false
-    var previousVideoId = ""
+    var currentVideoId = ""
+    var currentSecond = "0"
+
+    var updateJoinedUsersTime = false
+    var currentUsers = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         seekToEditText = findViewById(R.id.seektoEditText)
         stateOfPlayer = findViewById(R.id.stateOfPlayer_id_tv)
         stateOfPlayer = findViewById(R.id.seeking_id_tv)
-
+        videoURLEditText = findViewById(R.id.load_videoLink_ED)
 
         sessionID = intent.getStringExtra("sessionID").toString()
 
@@ -57,6 +62,8 @@ class MainActivity : AppCompatActivity() {
 
         dbPath = "sessions/session_$sessionID"
         myRef = database.getReference(dbPath)
+
+        myRef.child("seekingState").setValue("false")
 
         initializePlayer()
 
@@ -67,17 +74,50 @@ class MainActivity : AppCompatActivity() {
                 Log.e("pleasework", dataSnapshot.toString())
 
                 val videoState = dataSnapshot.child("videoState").getValue(String::class.java)
-                val seekingState = dataSnapshot.child("seekingState").getValue(String::class.java)
-                val seekingTime = dataSnapshot.child("seekingTime").getValue(String::class.java)
-                val videoId = dataSnapshot.child("videoURL").getValue(String::class.java).toString()
+                val seekingTime = dataSnapshot.child("seekingTime").getValue(String::class.java)?.toString()
+                val currentSeconds = dataSnapshot.child("currentSecond").getValue(String::class.java)?.toInt()
+                var joined = 0
+                //Very Bad Logic I know
 
 
-                var seeked = false
+                if(dataSnapshot.child("joined").exists()){
+                     joined = dataSnapshot.child("joined").getValue(String::class.java)?.toInt()!!
+                        if(joined > currentUsers){
+                            currentUsers = joined
+                            updateJoinedUsersTime = true
+                        }else{
+                            updateJoinedUsersTime = false
+                        }
 
-                if(!videoLoaded) {
-                    //Check if video is not loaded
-                    loadVideo(videoId)
-                    videoLoaded = true
+                }
+
+
+
+
+                if (dataSnapshot.child("videoURL").exists()) {
+                    val videoId = dataSnapshot.child("videoURL").getValue(String::class.java)?.toString()
+                    if(!videoLoaded) {
+                        if (videoId != null) {
+                            Log.e("currentSeconds", currentSeconds.toString())
+                            if(joined>0){
+                                if (currentSeconds != null) {
+                                    loadVideo(videoId,currentSeconds + 5)
+                                }
+                            }else{
+                                if (currentSeconds != null) {
+                                    loadVideo(videoId,currentSeconds)
+                                }
+                            }
+                            videoLoaded = true
+                            currentVideoId = videoId
+                            currentSecond = currentSeconds.toString()
+                        }
+                    }
+                    if (currentVideoId != videoId){
+                        videoLoaded = false
+                        myRef.child("seekingTime").setValue("0")
+                    }
+
                 }
 
 
@@ -89,11 +129,18 @@ class MainActivity : AppCompatActivity() {
                     playVideo()
                 }
 
-
-                if(seekingState == "false" && !seeked){
-                    seekTo(seekingTime!!.toFloat())
-                    seeked=true
+                var seeked = false
+                if (dataSnapshot.child("seekingState").exists()) {
+                    val seekingState = dataSnapshot.child("seekingState").getValue(String::class.java)?.toString()
+                    if(seekingState == "false" && !seeked){
+                        if (seekingTime != null) {
+                            seekTo(seekingTime.toFloat())
+                        }
+                        seeked=true
+                    }
                 }
+
+
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -128,14 +175,23 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    private fun loadVideo(videoId: String) {
+    private fun loadVideo(videoId: String, startSeconds: Int) {
+
         if (::initializedYouTubePlayer.isInitialized) {
-            initializedYouTubePlayer.loadVideo(videoId, 0f)
+            if (startSeconds > 0) {
+                initializedYouTubePlayer.loadVideo(videoId, startSeconds.toFloat())
+            } else {
+                initializedYouTubePlayer.loadVideo(videoId, 0.0f)
+            }
         } else {
             youTubePlayerView.getYouTubePlayerWhenReady(object : YouTubePlayerCallback {
                 override fun onYouTubePlayer(youTubePlayer: YouTubePlayer) {
                     initializedYouTubePlayer = youTubePlayer
-                    initializedYouTubePlayer.loadVideo(videoId, 0f)
+                    if (startSeconds > 0) {
+                        initializedYouTubePlayer.loadVideo(videoId, startSeconds.toFloat())
+                    } else {
+                        initializedYouTubePlayer.loadVideo(videoId, 0.0f)
+                    }
                 }
             })
         }
@@ -185,7 +241,7 @@ class MainActivity : AppCompatActivity() {
 
 
     fun loadBtn(view: View) {
-        loadVideo("LtMvg0RfSuA")
+        myRef.child("videoURL").setValue(videoURLEditText.text.toString())
     }
     fun pauseBtn(view: View) {
         pauseVideo()
@@ -215,9 +271,13 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-            var currentSecond = 0
             override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
-                currentSecond = second.toInt()
+                //currentSecond = second.toInt()
+                if(updateJoinedUsersTime){
+                    myRef.child("currentSecond").setValue(second.toInt().toString())
+                    updateJoinedUsersTime = false
+                }
+
             }
 
             override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
