@@ -42,6 +42,9 @@ class MainActivity : AppCompatActivity() {
     var videoLoaded = false
     var previousVideoId = ""
 
+    var updateJoinedUsersTime = false
+    var currentUsers = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -61,6 +64,9 @@ class MainActivity : AppCompatActivity() {
         initializePlayer()
 
 
+        myRef.child("seekingState").setValue("false")
+        myRef.child("seekingTime").setValue("0")
+
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
 
@@ -70,9 +76,21 @@ class MainActivity : AppCompatActivity() {
                 val seekingState = dataSnapshot.child("seekingState").getValue(String::class.java)
                 val seekingTime = dataSnapshot.child("seekingTime").getValue(String::class.java)
                 val videoId = dataSnapshot.child("videoURL").getValue(String::class.java).toString()
+                var joined = 0
+                //Very Bad Logic I know
 
 
-                var seeked = false
+                if(dataSnapshot.child("joined").exists()){
+                    joined = dataSnapshot.child("joined").getValue(String::class.java)?.toInt()!!
+                    if(joined > currentUsers){
+                        currentUsers = joined
+                        updateJoinedUsersTime = true
+                    }else{
+                        updateJoinedUsersTime = false
+                    }
+
+                }
+
 
                 if(!videoLoaded) {
                     //Check if video is not loaded
@@ -89,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                     playVideo()
                 }
 
-
+                var seeked = false
                 if(seekingState == "false" && !seeked){
                     seekTo(seekingTime!!.toFloat())
                     seeked=true
@@ -215,9 +233,13 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-            var currentSecond = 0
+            var currentSecond = 0.0f
             override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
-                currentSecond = second.toInt()
+                currentSecond = second
+                if(updateJoinedUsersTime){
+                    myRef.child("seekingTime").setValue((second+1.0f).toString())
+                    updateJoinedUsersTime = false
+                }
             }
 
             override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {

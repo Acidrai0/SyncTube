@@ -49,7 +49,7 @@ class ConnectionActivity : AppCompatActivity() {
 
     fun joinSession(view: View) {
 
-
+        myRef.child("session_" + mSessionCodeEd.text.toString()).child("joined").setValue("1")
         val i = Intent(this, MainActivity::class.java)
         i.putExtra("sessionID", mSessionCodeEd.text.toString())
         startActivity(i)

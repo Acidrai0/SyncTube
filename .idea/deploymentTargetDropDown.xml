@@ -7,22 +7,11 @@
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\Arbaz\.android\avd\4.7_WXGA_API_28.avd" />
+            <value value="C:\Users\Arbaz\.android\avd\Copy_of_4.7_WXGA_API_28.avd" />
           </Key>
         </deviceKey>
       </Target>
     </runningDeviceTargetSelectedWithDropDown>
-    <targetSelectedWithDropDown>
-      <Target>
-        <type value="QUICK_BOOT_TARGET" />
-        <deviceKey>
-          <Key>
-            <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\Arbaz\.android\avd\4.7_WXGA_API_28.avd" />
-          </Key>
-        </deviceKey>
-      </Target>
-    </targetSelectedWithDropDown>
-    <timeTargetWasSelectedWithDropDown value="2023-01-27T13:05:35.216634Z" />
+    <timeTargetWasSelectedWithDropDown value="2023-01-27T21:51:54.580629100Z" />
   </component>
 </project>
