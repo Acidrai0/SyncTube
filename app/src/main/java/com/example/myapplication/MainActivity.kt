@@ -193,12 +193,18 @@ class MainActivity : AppCompatActivity() {
 
             }
 
+            var currentSecond = 0
+            override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
+                currentSecond = second.toInt()
+            }
+
             override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
                 stateOfPlayer.text = state.toString()
                 if(state == PlayerConstants.PlayerState.PLAYING){
                     myRef.child("session1").child("videoState").setValue(state.toString())
                 }else if (state == PlayerConstants.PlayerState.PAUSED){
                     myRef.child("session1").child("videoState").setValue(state.toString())
+                    myRef.child("session1").child("seekingTime").setValue(currentSecond.toString())
                 }else if(state == PlayerConstants.PlayerState.UNSTARTED){
                     myRef.child("session1").child("videoState").setValue(state.toString())
                 }
