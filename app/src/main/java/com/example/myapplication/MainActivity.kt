@@ -38,37 +38,53 @@ class MainActivity : AppCompatActivity() {
     var dbPath: String = "sessions"
     var myRef = database.getReference(dbPath)
 
+    // initialize variables for session ID, video load status, and current video ID
 
     var sessionID = ""
     var videoLoaded = false
     var currentVideoId = ""
 
+    // variable to track if users have joined the session since the last check
     var updateJoinedUsersTime = false
+    // variable to track the current number of users in the session
     var currentUsers = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // initialize views
         seekToEditText = findViewById(R.id.seektoEditText)
         stateOfPlayer = findViewById(R.id.stateOfPlayer_id_tv)
         stateOfPlayer = findViewById(R.id.seeking_id_tv)
         videoUrlEditText = findViewById(R.id.load_video_EditText)
 
+        // get session ID from intent
         sessionID = intent.getStringExtra("sessionID").toString()
 
 
-
+        // set reference to specific session in Firebase database
         dbPath = "sessions/session_$sessionID"
         myRef = database.getReference(dbPath)
 
+        // initialize YouTube player
         initializePlayer()
 
+        //Handle all the firebase Logic here
+        firebaseHandler()
 
 
+
+    }
+
+
+    private fun firebaseHandler(){
+        // add listener for changes to the session in the Firebase database
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
 
+                // check if seekingTime, seekingState, and joined keys exist in the snapshot
+                // and set initial values if they do not
                 if(!dataSnapshot.child("seekingTime").exists()){
                     myRef.child("seekingTime").setValue("0")
                 }
@@ -80,18 +96,18 @@ class MainActivity : AppCompatActivity() {
                 }
 
 
-
-
                 Log.e("pleasework", dataSnapshot.toString())
 
+
+                // get values for video state, seeking state, seeking time, and video ID from snapshot
                 val videoState = dataSnapshot.child("videoState").getValue(String::class.java)
                 val seekingState = dataSnapshot.child("seekingState").getValue(String::class.java)
                 val seekingTime = dataSnapshot.child("seekingTime").getValue(String::class.java)
-                val videoId = dataSnapshot.child("videoURL").getValue(String::class.java).toString()
 
 
+                // check if there is a joined key in the snapshot, and update currentUsers
                 if(dataSnapshot.child("joined").exists()){
-                     val joined = dataSnapshot.child("joined").getValue(String::class.java)?.toInt()!!
+                    val joined = dataSnapshot.child("joined").getValue(String::class.java)?.toInt()!!
                     if(joined > currentUsers){
                         updateJoinedUsersTime = true
                         currentUsers = joined
@@ -101,15 +117,19 @@ class MainActivity : AppCompatActivity() {
 
                 }
 
+                // Check if the "videoURL" child exists in the database
                 if (dataSnapshot.child("videoURL").exists()) {
                     val videoId = dataSnapshot.child("videoURL").getValue(String::class.java)?.toString()
+                    // Check if the video has not been loaded yet
                     if(!videoLoaded) {
                         if (videoId != null) {
+                            // Load the video
                             loadVideo(videoId)
                             videoLoaded = true
                             currentVideoId = videoId
                         }
                     }
+                    // Check if the videoId has been changed
                     if (currentVideoId != videoId){
                         videoLoaded = false
                         myRef.child("seekingTime").setValue("0")
@@ -124,7 +144,8 @@ class MainActivity : AppCompatActivity() {
 //                    videoLoaded = true
 //                }
 
-
+                // Get the current state of the video from Database and
+                // change youtube player state
                 if (videoState == "PAUSED") {
                     pauseVideo()
                 }else if (videoState == "PLAYING"){
@@ -133,9 +154,14 @@ class MainActivity : AppCompatActivity() {
                     playVideo()
                 }
 
+
+                // A flag to check if the video has been seeked
                 var seeked = false
+
+                // Check if the seeking state is "false" and the
                 if(seekingState == "false" && !seeked){
                     seekTo(seekingTime!!.toFloat())
+                    // Set the flag to true to indicate that the video has been seeked
                     seeked=true
                 }
             }
@@ -144,10 +170,6 @@ class MainActivity : AppCompatActivity() {
                 // Failed to read value
             }
         })
-
-
-
-
     }
 
 
