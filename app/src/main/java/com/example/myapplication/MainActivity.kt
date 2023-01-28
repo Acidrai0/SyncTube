@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
 
     lateinit var seekToEditText: EditText
+    lateinit var videoUrlEditText: EditText
     lateinit var stateOfPlayer: TextView
     lateinit var seekinTime: TextView
 
@@ -40,7 +41,7 @@ class MainActivity : AppCompatActivity() {
 
     var sessionID = ""
     var videoLoaded = false
-    var previousVideoId = ""
+    var currentVideoId = ""
 
     var updateJoinedUsersTime = false
     var currentUsers = 0
@@ -52,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         seekToEditText = findViewById(R.id.seektoEditText)
         stateOfPlayer = findViewById(R.id.stateOfPlayer_id_tv)
         stateOfPlayer = findViewById(R.id.seeking_id_tv)
-
+        videoUrlEditText = findViewById(R.id.load_video_EditText)
 
         sessionID = intent.getStringExtra("sessionID").toString()
 
@@ -89,9 +90,8 @@ class MainActivity : AppCompatActivity() {
                 val videoId = dataSnapshot.child("videoURL").getValue(String::class.java).toString()
 
 
-
                 if(dataSnapshot.child("joined").exists()){
-                    val joined = dataSnapshot.child("joined").getValue(String::class.java)?.toInt()!!
+                     val joined = dataSnapshot.child("joined").getValue(String::class.java)?.toInt()!!
                     if(joined > currentUsers){
                         updateJoinedUsersTime = true
                         currentUsers = joined
@@ -101,12 +101,28 @@ class MainActivity : AppCompatActivity() {
 
                 }
 
+                if (dataSnapshot.child("videoURL").exists()) {
+                    val videoId = dataSnapshot.child("videoURL").getValue(String::class.java)?.toString()
+                    if(!videoLoaded) {
+                        if (videoId != null) {
+                            loadVideo(videoId)
+                            videoLoaded = true
+                            currentVideoId = videoId
+                        }
+                    }
+                    if (currentVideoId != videoId){
+                        videoLoaded = false
+                        myRef.child("seekingTime").setValue("0")
 
-                if(!videoLoaded) {
-                    //Check if video is not loaded
-                    loadVideo(videoId)
-                    videoLoaded = true
+                    }
                 }
+
+
+//                if(!videoLoaded) {
+//                    //Check if video is not loaded
+//                    loadVideo(videoId)
+//                    videoLoaded = true
+//                }
 
 
                 if (videoState == "PAUSED") {
@@ -213,7 +229,8 @@ class MainActivity : AppCompatActivity() {
 
 
     fun loadBtn(view: View) {
-        loadVideo("LtMvg0RfSuA")
+        myRef.child("videoURL").setValue(videoUrlEditText.text.toString())
+        loadVideo(videoUrlEditText.text.toString())
     }
     fun pauseBtn(view: View) {
         pauseVideo()
